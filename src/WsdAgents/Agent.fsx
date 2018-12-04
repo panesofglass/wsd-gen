@@ -1,5 +1,6 @@
 ﻿#load "Agent.fs"
 
+open System
 open WsdAgents
 
 (*
@@ -13,6 +14,12 @@ finalizeWIP->-home:goHome
 WIP-->+cancelWIP:abandonOnboarding(identifier)
 cancelWIP->-home:goHome
 *)
+
+type State =
+    | State of name:string
+
+type Message =
+    | Message of name:string * data:string
 
 let createAgent () =
     let initState = State "home"
@@ -45,7 +52,7 @@ let createAgent () =
           ToState = State "home"
           Message = Message("goHome", "") }
     ]
-    Agent("", initState, transitions)
+    Agent(Uri "urn:agent:1", initState, transitions, function (Message(expected,_)), (Message(actual,_)) -> expected = actual)
 
 let agent = createAgent()
 

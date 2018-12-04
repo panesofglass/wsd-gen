@@ -1,39 +1,32 @@
 namespace WsdAgents
 
-type State =
-    | State of name:string
+open System
 
-type Message =
-    | Message of name:string * data:string
+type Transition<'State, 'Message> =
+    { FromState : 'State
+      Message : 'Message
+      ToState : 'State }
 
-type Transition =
-    { FromState : State
-      Message : Message
-      ToState : State }
-
-type internal AgentMessage =
-    | GetState of AsyncReplyChannel<State * Transition list>
-    | Subscribe of transition:Transition * handler:(Message -> unit)
-    | Transition of message:Message
+type internal AgentMessage<'State, 'Message> =
+    | GetState of AsyncReplyChannel<'State * Transition<'State, 'Message> list>
+    | Subscribe of transition:Transition<'State, 'Message> * handler:('Message -> unit)
+    | Transition of message:'Message
 
 module Agent =
 
-    let allowedTransitions state (transitions:Transition list) =
+    let allowedTransitions state (transitions:Transition<'State, 'Message> list) =
         transitions
         |> List.filter (fun t -> t.FromState = state)
     
-    let tryFindAllowedTransition state message (transitions:Transition list) =
+    let tryFindAllowedTransition comparer state message (transitions:Transition<'State, 'Message> list) =
         transitions
-        |> List.tryFind (fun t ->
-            let (Message(expected, _)) = t.Message
-            let (Message(actual, _)) = message
-            t.FromState = state && expected = actual)
+        |> List.tryFind (fun t -> t.FromState = state && comparer(t.Message, message))
 
-type Agent (identifier:string, initState:State, transitions:Transition list) =
+type Agent<'State, 'Message when 'State : comparison and 'Message : comparison> (identifier:Uri, initState:'State, transitions:Transition<'State, 'Message> list, comparer) =
 
     let agent =
         MailboxProcessor.Start(fun inbox ->
-            let rec loop state (handlers:Map<Transition, Message -> unit>) = async {
+            let rec loop state (handlers:Map<Transition<'State, 'Message>, 'Message -> unit>) = async {
                 match! inbox.Receive() with
                 | GetState(channel) ->
                     let allowedTransitions = Agent.allowedTransitions state transitions
@@ -47,7 +40,7 @@ type Agent (identifier:string, initState:State, transitions:Transition list) =
                         eprintfn "Coud not add handler for missing transition: %A" transition
                         return! loop state handlers
                 | Transition message ->
-                    match Agent.tryFindAllowedTransition state message transitions with
+                    match Agent.tryFindAllowedTransition comparer state message transitions with
                     | Some transition ->
                         match Map.tryFind transition handlers with
                         | Some handler ->

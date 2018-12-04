@@ -1,5 +1,6 @@
 module Tests
 
+open System
 open Expecto
 open WsdAgents
 
@@ -14,6 +15,12 @@ finalizeWIP->-home:goHome
 WIP-->+cancelWIP:abandonOnboarding(identifier)
 cancelWIP->-home:goHome
 *)
+
+type State =
+    | State of name:string
+
+type Message =
+    | Message of name:string * data:string
 
 let createAgent initState =
     let transitions = [
@@ -45,13 +52,13 @@ let createAgent initState =
           ToState = State "home"
           Message = Message("goHome", "") }
     ]
-    Agent("", initState, transitions)
+    Agent(Uri "urn:agent:1", initState, transitions, function (Message(expected,_)), (Message(actual,_)) -> expected = actual)
 
 [<Tests>]
 let tests =
     testSequenced <| testList "agents" [
         test "agent has correct identifier" {
-            let expected = ""
+            let expected = Uri "urn:agent:1"
             let agent = createAgent (State "home")
             let actual = agent.Identifier
             Expect.equal actual expected "Identifier should be an empty string."
