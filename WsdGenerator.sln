@@ -20,6 +20,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{64338F11-B
 		docs\Agents.md = docs\Agents.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{23521992-9B49-4F4C-986F-BC1F330C90A1}"
+	ProjectSection(SolutionItems) = preProject
+		onboardingAPI.png = onboardingAPI.png
+		onboardingAPI.wsd = onboardingAPI.wsd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
