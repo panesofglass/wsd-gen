@@ -2,6 +2,7 @@ namespace WsdAgents
 
 open System
 
+/// Defines a transition from one state to another state based on a message.
 type Transition<'State, 'Message> =
     { FromState : 'State
       Message : 'Message
@@ -22,6 +23,7 @@ module Agent =
         transitions
         |> List.tryFind (fun t -> t.FromState = state && comparer(t.Message, message))
 
+/// A resource-oriented agent that transitions the state based on messages received.
 type Agent<'State, 'Message when 'State : comparison and 'Message : comparison> (identifier:Uri, initState:'State, transitions:Transition<'State, 'Message> list, comparer) =
 
     let agent =

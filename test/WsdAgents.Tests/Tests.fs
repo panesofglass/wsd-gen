@@ -4,18 +4,6 @@ open System
 open Expecto
 open WsdAgents
 
-(*
-home->+WIP: startOnboarding(identifier)
-WIP->+customerData: collectCustomerData(identifier,name,email)
-customerData-->-WIP: saveToWIP(identifier,name,email)
-WIP->+accountData: collectAccountData(identifier,region,discount)
-accountData-->-WIP:saveToWIP(identifier,region,discount)
-WIP-->+finalizeWIP:completeOnboarding(identifier)
-finalizeWIP->-home:goHome
-WIP-->+cancelWIP:abandonOnboarding(identifier)
-cancelWIP->-home:goHome
-*)
-
 type State =
     | State of name:string
 
@@ -24,30 +12,39 @@ type Message =
 
 let createAgent initState =
     let transitions = [
+        // home->+WIP: startOnboarding(identifier)
         { FromState = State "home"
           ToState = State "WIP"
           Message = Message("startOnboarding", "identifier") }
+        // WIP->+customerData: collectCustomerData(identifier,name,email)
         { FromState = State "WIP"
           ToState = State "customerData"
           Message = Message("collectCustomerData", "identifier,name,email") }
+        // customerData-->-WIP: saveToWIP(identifier,name,email)
         { FromState = State "customerData"
           ToState = State "WIP"
           Message = Message("saveToWIP", "identifier,name,email") }
+        // WIP->+accountData: collectAccountData(identifier,region,discount)
         { FromState = State "WIP"
           ToState = State "accountData"
           Message = Message("collectAccountData", "identifier,region,discount") }
+        // accountData-->-WIP:saveToWIP(identifier,region,discount)
         { FromState = State "accountData"
           ToState = State "WIP"
           Message = Message("saveToWIP", "identifier,region,discount") }
+        // WIP-->+finalizeWIP:completeOnboarding(identifier)
         { FromState = State "WIP"
           ToState = State "finalizeWIP"
           Message = Message("completeOnboarding", "identifier") }
+        // finalizeWIP->-home:goHome
         { FromState = State "finalizeWIP"
           ToState = State "home"
           Message = Message("goHome", "") }
+        // WIP-->+cancelWIP:abandonOnboarding(identifier)
         { FromState = State "WIP"
           ToState = State "cancelWIP"
           Message = Message("abandonOnboarding", "identifier") }
+        // cancelWIP->-home:goHome
         { FromState = State "cancelWIP"
           ToState = State "home"
           Message = Message("goHome", "") }
