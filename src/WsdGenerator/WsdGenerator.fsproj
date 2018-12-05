@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Properties\launchSettings.json" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

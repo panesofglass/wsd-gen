@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WsdGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)onboardingAPI.wsd"
+    }
+  }
+}
